@@ -4,8 +4,8 @@
 ```
 .
 ├── code
-|   ├── fish_analysis.py・・・・・・・・・bagファイルの検出を行うコード
-|   └── fish_deteciton.py・・・・・・・検出したデータを解析するコード
+|   ├── fish_deteciton.py・・・・・・・・・bagファイルの検出を行うコード
+|   └── fish_analysis.py・・・・・・・検出したデータを解析するコード
 ├── model
 |   ├── best.pt ・・・・・・・・・制度は悪いが数多く検出してくれるモデル
 |   └── model_fish.pt・・・・・・・制度は高いが少ない数を検出してくれるモデル
