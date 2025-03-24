@@ -3,54 +3,55 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# CSVƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+# CSVãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 df = pd.read_csv('detection_data.csv')
 
-# 'Average Distance (m)' ‚ª0‚Å‚È‚¢s‚Ì‚İ‚ğc‚·
+# 'Average Distance (m)' ãŒ0ã§ãªã„è¡Œã®ã¿ã‚’æ®‹ã™
 df = df[df['Average Distance (m)'] != 0]
 
-# ŒÅ’è’l
-FOV_horizontal = 86  # …•½•ûŒü‚Ì‹–ìŠpi“xj
-FOV_vertical = 57    # ‚’¼•ûŒü‚Ì‹–ìŠpi“xj
-resolution_horizontal = 840  # …•½•ûŒü‚Ì‰ğ‘œ“xiƒsƒNƒZƒ‹j
-resolution_vertical = 480    # ‚’¼•ûŒü‚Ì‰ğ‘œ“xiƒsƒNƒZƒ‹j
+# å›ºå®šå€¤
+FOV_horizontal = 86  # æ°´å¹³æ–¹å‘ã®è¦–é‡è§’ï¼ˆåº¦ï¼‰
+FOV_vertical = 57    # å‚ç›´æ–¹å‘ã®è¦–é‡è§’ï¼ˆåº¦ï¼‰
+resolution_horizontal = 840  # æ°´å¹³æ–¹å‘ã®è§£åƒåº¦ï¼ˆãƒ”ã‚¯ã‚»ãƒ«ï¼‰
+resolution_vertical = 480    # å‚ç›´æ–¹å‘ã®è§£åƒåº¦ï¼ˆãƒ”ã‚¯ã‚»ãƒ«ï¼‰
 
-# ‹–ì•‚ÌŒvZ
-# …•½•ûŒü‚Ì‹–ì•‚ğŒvZ
+# è¦–é‡å¹…ã®è¨ˆç®—
+# æ°´å¹³æ–¹å‘ã®è¦–é‡å¹…ã‚’è¨ˆç®—
 df['W_horizontal'] = 2 * df['Average Distance (m)'] * math.tan(math.radians(FOV_horizontal / 2))
-# ‚’¼•ûŒü‚Ì‹–ì•‚ğŒvZ
+# å‚ç›´æ–¹å‘ã®è¦–é‡å¹…ã‚’è¨ˆç®—
 df['W_vertical'] = 2 * df['Average Distance (m)'] * math.tan(math.radians(FOV_vertical / 2))
 
-# 1ƒsƒNƒZƒ‹‚ ‚½‚è‚Ì•¨—“I‚È•‚ÌŒvZ
-df['pixel_width'] = df['W_horizontal'] / resolution_horizontal  # …•½•ûŒü
-df['pixel_height'] = df['W_vertical'] / resolution_vertical  # ‚’¼•ûŒü
+# 1ãƒ”ã‚¯ã‚»ãƒ«ã‚ãŸã‚Šã®ç‰©ç†çš„ãªå¹…ã®è¨ˆç®—
+# chatgptã¨ãƒãƒƒãƒˆã®æƒ…å ±ã‚’å‚è€ƒã«ä»¥ä¸‹ã®è¨ˆç®—å¼æ§‹ç¯‰ã—ãŸãŒã€å°‘ã—æ€ªã—ã„ãŸã‚è¦æ¤œè¨¼
+df['pixel_width'] = df['W_horizontal'] / resolution_horizontal  # æ°´å¹³æ–¹å‘
+df['pixel_height'] = df['W_vertical'] / resolution_vertical  # å‚ç›´æ–¹å‘
 
-# •¨‘Ì‚Ì•¨—“I‚È‘å‚«‚³i–ÊÏj‚ğŒvZ
+# ç‰©ä½“ã®ç‰©ç†çš„ãªå¤§ãã•ï¼ˆé¢ç©ï¼‰ã‚’è¨ˆç®—
 df['size'] = df['Pixel Count'] * df['pixel_width'] * df['pixel_height']
 
-# 'size' ‚ª0‚Å‚È‚¢s‚ÅƒOƒ‹[ƒv‰»‚µ‚Ä•½‹Ï‚ğŒvZ
+# 'size' ãŒ0ã§ãªã„è¡Œã§ã‚°ãƒ«ãƒ¼ãƒ—åŒ–ã—ã¦å¹³å‡ã‚’è¨ˆç®—
 mean_pixel_counts = df[df['size'] != 0].groupby('Detection ID')['size'].mean()
 print(mean_pixel_counts)
 
-# ƒqƒXƒgƒOƒ‰ƒ€‚ğŒvZ
+# ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã‚’è¨ˆç®—
 bins = np.linspace(0, 2, 5)
 freq, _ = np.histogram(mean_pixel_counts, bins=bins)
-class_value = (bins[:-1] + bins[1:]) / 2  # ŠK‹‰’l
-rel_freq = freq / mean_pixel_counts.count()  # ‘Š‘Î“x”
-cum_freq = np.cumsum(freq)  # —İÏ“x”
+class_value = (bins[:-1] + bins[1:]) / 2  # éšç´šå€¤
+rel_freq = freq / mean_pixel_counts.count()  # ç›¸å¯¾åº¦æ•°
+cum_freq = np.cumsum(freq)  # ç´¯ç©åº¦æ•°
 
-# ƒf[ƒ^ƒtƒŒ[ƒ€‚ÉŒ‹‰Ê‚ğ‚Ü‚Æ‚ß‚é
+# ãƒ‡ãƒ¼ã‚¿ãƒ•ãƒ¬ãƒ¼ãƒ ã«çµæœã‚’ã¾ã¨ã‚ã‚‹
 dist = pd.DataFrame(
     {
         "grade value": class_value,
         "meter": freq,
-        "‘Š‘Î“x”": rel_freq,
-        "—İÏ“x”": cum_freq,
+        "ç›¸å¯¾åº¦æ•°": rel_freq,
+        "ç´¯ç©åº¦æ•°": cum_freq,
     }
 )
 
 print(dist)
 
-# –_ƒOƒ‰ƒt‚ğƒvƒƒbƒg
+# æ£’ã‚°ãƒ©ãƒ•ã‚’ãƒ—ãƒ­ãƒƒãƒˆ
 dist.plot.bar(x="grade value", y="meter", width=1, ec="k", lw=2)
 plt.show()
